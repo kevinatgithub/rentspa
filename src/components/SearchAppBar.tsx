@@ -51,7 +51,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function SearchAppBar() {
+interface SearchAppBarProps{
+    setDrawerOpen: (open:boolean) => void;
+}
+
+const SearchAppBar: React.FC<SearchAppBarProps> = ({setDrawerOpen}) => {
+    const handleClicked = () => {
+        setDrawerOpen(true)
+    }
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -62,6 +69,7 @@ export default function SearchAppBar() {
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
+            onClick={handleClicked}
           >
             <MenuIcon />
           </IconButton>
@@ -71,7 +79,7 @@ export default function SearchAppBar() {
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
-            MUI
+            Wena's Boarding House
           </Typography>
           <Search>
             <SearchIconWrapper>
@@ -87,3 +95,5 @@ export default function SearchAppBar() {
     </Box>
   );
 }
+
+export default SearchAppBar

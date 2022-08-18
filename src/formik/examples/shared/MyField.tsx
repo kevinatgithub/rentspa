@@ -9,18 +9,19 @@ interface MyFieldProps {
     InputProps?: any,
     multiline?: boolean,
     rows?: number,
-    maxRows?: number
+    maxRows?: number,
+    value?: any,
+    defaultValue?: any,
+    InputLabelProps?: any
 }
 
-const MyField:FC<MyFieldProps> = ({label, fieldProps, fullWidth, ...otherProps}) => {
+const MyField:FC<MyFieldProps> = ({fieldProps, ...otherProps}) => {
     const {field, meta} = fieldProps
     return <TextField 
         {...otherProps}
-        fullWidth={fullWidth}
-        label={label}
         {...(meta.error && meta.touched ? {error:true} : {})}
         {...(meta.error && meta.touched ? {helperText: meta.error} : {})}
-        {...field}
+        {...field} 
     />
 }
 

@@ -1,19 +1,33 @@
-import { Box, Button, Grid, InputAdornment, TextField, Typography } from '@mui/material';
-import { Field, Form, Formik } from 'formik'
-import React, { FC } from 'react'
-import { validationSchema } from '../../formik/examples/shared/models';
+import { Alert, Button, Card, CardContent, Grid, Snackbar } from '@mui/material';
+import { Form, Formik } from 'formik'
+import React, { FC, useEffect, useState } from 'react'
 import * as Yup from 'yup';
-import MyField from '../../formik/examples/shared/MyField';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import API from '../../api';
+import RoomForm from './RoomForm';
 
-interface CreateRoomProps{
-    editing?: boolean
-}
-
-const CreateRoom:FC<CreateRoomProps> = ({editing}) => {
-    const initialValues = {
+const CreateRoom:FC = () => {
+    const { id } = useParams()
+    const editing = id ? true : false
+    const [initialValues, setInitialValues] = useState({
         name: "", monthlyRate: "", remarks: ""
-    };
+    })
+    const navigate = useNavigate()
+    const [open, setOpen] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+
+    useEffect(() => {
+        if ( id ){
+            API.get(`/Rooms/${id}`).then(r => {
+                if (r.data){
+                    const {name, pricePerMonth, remarks} = r.data
+                    setInitialValues({
+                        name, remarks, monthlyRate: pricePerMonth
+                    })
+                }
+            })
+        }
+    }, [id])
 
     const validationSchema = Yup.object({
         name: Yup.string().required("Please enter room name/number"),
@@ -21,43 +35,56 @@ const CreateRoom:FC<CreateRoomProps> = ({editing}) => {
     })
 
     const handleSubmit = (values:any) => {
-
+        setDisabled(true)
+        if ( !id ){
+            API.post("/Rooms",{
+                id:0,
+                name: values.name,
+                pricePerMonth: values.monthlyRate*1,
+                remarks: values.remarks
+            }).then(result => {
+                navigate("/rooms")
+            })
+        } else {
+            API.put(`/Rooms`, {
+                id, name: values.name, pricePerMonth: values.monthlyRate*1, remarks: values.remarks
+            }).then(_ => {
+                navigate(`/rooms/${id}`)
+            })
+        }
+        setOpen(true);
     }
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setOpen(false);
+      };
+    
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+    <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema} onSubmit={handleSubmit}>
         {formik => <Form>
-            <Grid container p={2} rowSpacing={2} spacing={2}>
-                <Grid item xs={12}>
-                    <Typography variant="h5" gutterBottom component="div" color={"primary"}>
-                        {editing ? "Update" : "New"} Room Details
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4}>
-                    <Field name="name" >
-                        {(fieldProps:any) => <MyField fullWidth label="Room Name/Number" fieldProps={fieldProps} />}
-                    </Field>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4}>
-                    <Field name="monthlyRate" >
-                        {(fieldProps:any) => <MyField fullWidth label="Monthly Rate" fieldProps={fieldProps} InputProps={{
-                            startAdornment: <InputAdornment position="start">P</InputAdornment>
-                        }} />}
-                    </Field>
-                </Grid>
-                <Grid item xs={12} md={8} lg={8}>
-                    <Field name="remarks" >
-                        {(fieldProps:any) => <MyField fullWidth label="Remarks" fieldProps={fieldProps} multiline rows={2} maxRows={4} />}
-                    </Field>
-                </Grid>
-            </Grid>    
-            <Grid container p={2} rowSpacing={2} spacing={2}>
-                <Grid item xs={6} md={2}>
-                    <Button variant='contained' size='large' fullWidth>Save</Button>
-                </Grid>
-                <Grid item xs={6} md={4}>
-                    <Link to="/rooms"><Button variant='contained' color='secondary' size='large' fullWidth>Cancel</Button></Link>
-                </Grid>
-            </Grid>    
+            <Card>
+                <CardContent>
+                    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+                            This is a success message!
+                        </Alert>
+                    </Snackbar>
+                    <RoomForm editing={id ? true : false} />
+                        
+                    <Grid container p={2} rowSpacing={2} spacing={2}>
+                        <Grid item xs={6} md={2}>
+                            <Button variant='contained' size='large' fullWidth onClick={e => formik.submitForm()} disabled={disabled}>Save</Button>
+                        </Grid>
+                        <Grid item xs={6} md={2}>
+                            <Link to="/rooms"><Button variant='contained' color='secondary' size='large' fullWidth disabled={disabled}>Cancel</Button></Link>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
         </Form>}
     </Formik>
   )

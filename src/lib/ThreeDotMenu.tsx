@@ -59,7 +59,8 @@ const ThreeDotMenu: FC<ThreeDotMenuProps> = ({obj,open,setOpen,anchorRef,items})
           role={undefined}
           placement="bottom-start"
           transition
-          disablePortal
+          disablePortal 
+          style={{zIndex:9999}}
         >
           {({ TransitionProps, placement }) => (
             <Grow
