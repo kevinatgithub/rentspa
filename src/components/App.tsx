@@ -55,7 +55,7 @@ function App() {
                       <Routes>
                           <Route path="/" element={<NewPayment />}></Route>
                           <Route path="/payments" element={<Payments />}></Route>
-                          <Route path="/payments/preview" element={<PreviewPayment />}></Route>
+                          <Route path="/payments/:id" element={<PreviewPayment />}></Route>
                           <Route path="/payments/create" element={<NewPayment />}></Route>
                           <Route path="/rents" element={<Rents />}></Route>
                           <Route path="/profiles" element={<Profiles />}></Route>

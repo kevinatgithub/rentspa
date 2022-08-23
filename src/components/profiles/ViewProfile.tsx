@@ -3,7 +3,7 @@ import React, { FC, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import API from '../../api'
 import ThreeDotMenu from '../../lib/ThreeDotMenu'
-import { ProfileModel, RentStatus, RoomModel, stringAvatar } from '../models'
+import { ProfileModel, RentModel, RentStatus, RoomModel, stringAvatar } from '../models'
 import RoomInfoCard from '../rooms/RoomInfoCard'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { AnyObject } from 'yup/lib/object'
@@ -16,10 +16,19 @@ const ViewProfile:FC = () => {
     const { id } = useParams()
     const [profile, setProfile] = useState<ProfileModel | null>(null)
     const [rooms, setRooms] = useState<RoomModel[]>([])
+    const [rent, setRent] = useState<RentModel>({ remarks: ''} as RentModel)
+
     useEffect(() => {
+        async function loadLatestRent(profileId:any){
+            const rents = (await API.get(`/Rents/findByProfileId/${profileId}`)).data.filter((r:RentModel) => r.status == 0)
+            const rent = rents.length > 0 ? rents[0] : { remarks : '' }
+            setRent(rent)
+        }
         async function loadRents(profileId:any){
             const rentsRequest = await API.get(`/Rents/findByProfileId/${profileId}`);
-            let rents = rentsRequest.data?.filter((rnt:any) => rnt.status === RentStatus.Active)
+            let rents = rentsRequest.data.sort((a:RentModel, b:RentModel) => {
+                return b.id - a.id
+            });//?.filter((rnt:any) => rnt.status === RentStatus.Active)
             let rooms : any[] = []
             for(const rent of rents){
                 let roomRequest = await API.get(`/Rooms/${rent.roomId}`);
@@ -36,6 +45,7 @@ const ViewProfile:FC = () => {
             }
             setProfile(r.data)
             loadRents(id)
+            loadLatestRent(id)
         })
     }, [id])
     const handleUpdate = () => {}
@@ -95,6 +105,12 @@ const ViewProfile:FC = () => {
                         <Grid item xs={6} sm={6} md={8} lg={10}>
                             <Typography variant="overline">{profile.gender != '' ? profile.gender : 'NOT PROVIDED'}</Typography>
                         </Grid>
+                        <Grid item xs={6} sm={6} md={4} lg={2}>
+                            <Typography variant="overline">Tenant Remarks</Typography>
+                        </Grid>
+                        <Grid item xs={6} sm={6} md={8} lg={10}>
+                            <Typography variant="overline">{rent.remarks}</Typography>
+                        </Grid>
                         <Grid item xs={12}>
                             <Typography variant="overline"><b>Room Details</b></Typography>
                         </Grid>
@@ -104,6 +120,9 @@ const ViewProfile:FC = () => {
                         {rooms.map((r:any,i:number) => <>
                             {r && <RoomInfoCard key={i} room={r} />}
                         </>)}
+                        <Grid item xs={12}>
+                            <Button variant='contained' onClick={() => window.history.go(-1)}>Back</Button>
+                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>

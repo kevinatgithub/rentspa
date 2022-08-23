@@ -5,17 +5,10 @@ import { validationSchema } from '../../formik/examples/shared/models';
 import * as Yup from 'yup';
 import MyField from '../../formik/examples/shared/MyField';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CreateRentModel, numberWithCommas, ProfileModel, RoomModel } from '../models';
+import { CreateRentModel, getStrDateToday, numberWithCommas, ProfileModel, RoomModel } from '../models';
 import API from '../../api';
 import RoomForm from '../rooms/RoomForm';
 import SelectField from '../../lib/SelectField';
-
-let today = new Date();
-let dd = String(today.getDate()).padStart(2, '0');
-let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-let yyyy = today.getFullYear();
-
-let strToday = `${yyyy}-${mm}-${dd}`;
 
 const CreateProfile:FC = () => {
     const [open, setOpen] = useState<boolean>(false);
@@ -30,7 +23,7 @@ const CreateProfile:FC = () => {
     const ndate = new Date();
 
     const initialValues = {
-        name: "", room: "", gender: "", contactNumber: "", startDate: strToday, remarks: "", monthlyRate: 0, roomName: "", roomRemarks: ""
+        name: "", room: "", gender: "", contactNumber: "", startDate: getStrDateToday(), remarks: "", monthlyRate: 0, roomName: "", roomRemarks: ""
     };
 
     const validationSchema = Yup.object({

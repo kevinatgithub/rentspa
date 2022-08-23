@@ -5,8 +5,10 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ThreeDotMenu from '../../lib/ThreeDotMenu'
 import API from '../../api';
-import { numberWithCommas, ProfileModel, RoomModel } from '../models'
+import { loadPayments, numberWithCommas, Payment, ProfileModel, RoomModel } from '../models'
 import TenantCard from '../profiles/TenantCard';
+import PaymentTable from '../payments/PaymentTable';
+import GroupIcon from '@mui/icons-material/Group';
 
 function ViewRoom() {
     const { id } = useParams()
@@ -15,11 +17,19 @@ function ViewRoom() {
     const [tenants, setTenants] = useState<ProfileModel[]>([]);
     const [open, setOpen] = useState(false);
     const [sbopen, setSbOpen] = useState(false);
+    const [payments, setPayments] = useState<Payment[]>([]);
     const anchorRef = useRef<HTMLButtonElement>(null);
 
     const refreshState = () => API.get(`/Rooms/${id}`).then(result => {
         setRoom(result.data);
         API.get(`/Profiles/findByRoomId/${id}`).then(r => setTenants(r.data));
+        API.get(`/Payments/findByRoomId/${id}`).then(r => {
+            const payments = r.data
+            loadPayments({
+                getPayments: () => payments,
+                setPayments: (payments:Payment[]) => setPayments(payments)
+            })
+        })
     });
     useEffect(() => {
         refreshState()
@@ -40,10 +50,6 @@ function ViewRoom() {
         setSbOpen(true)
         refreshState()
     }
-
-    const payments: any[] = [
-        // { amount: "P 1000", paidBy: "Juan Dela Cruz", startDate: "March 20, 2022", endDate:"April 20, 2022", date: 'April 20, 2022'}
-    ]
   return (
     <>
         {room && 
@@ -81,32 +87,42 @@ function ViewRoom() {
                             <CardContent>
                                 <Grid container spacing={2} rowSpacing={2}>
                                     <Grid item xs={6} md={4} xl={2}>
-                                        <Typography variant="subtitle2" gutterBottom component="div">
+                                        <Typography variant="overline" gutterBottom component="div">
                                             Room Name
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={6} md={8} xl={10}>
-                                        <Typography variant="body2" gutterBottom component="div">
+                                        <Typography variant="overline" gutterBottom component="div">
                                             {room.name}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={6} md={4} xl={2}>
-                                        <Typography variant="subtitle2" gutterBottom component="div">
+                                        <Typography variant="overline" gutterBottom component="div">
                                             Monthly Rate
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={6} md={8} xl={10}>
-                                        <Typography variant="body2" gutterBottom component="div">
+                                        <Typography variant="overline" gutterBottom component="div">
                                             P {room.pricePerMonth ? numberWithCommas(room.pricePerMonth) : 0}
                                         </Typography>
                                     </Grid>
+                                    <Grid item xs={6} md={4} xl={2}>
+                                        <Typography variant="overline" gutterBottom component="div">
+                                            Capacity
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={6} md={8} xl={10} alignItems={'center'} justifyContent="center">
+                                        <Typography variant="overline" gutterBottom component="div">
+                                            {room.capacity} <GroupIcon />
+                                        </Typography>
+                                    </Grid>
                                     <Grid item xs={12}>
-                                        <Typography variant="subtitle2" gutterBottom component="div">
+                                        <Typography variant="overline" gutterBottom component="div">
                                             Remarks
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Typography variant="body2" gutterBottom component="div">
+                                        <Typography variant="overline" gutterBottom component="div">
                                             {room.remarks ? room.remarks :'-'}
                                         </Typography>
                                     </Grid>
@@ -130,7 +146,8 @@ function ViewRoom() {
                     <Typography variant="overline" gutterBottom component="div">
                         Payment History
                     </Typography>
-                    <TableContainer component={Paper}>
+                    <PaymentTable payments={payments} />
+                    {/* <TableContainer component={Paper}>
                         <Table aria-label="simple table" sx={{ minWidth: 500}}>
                             <TableHead>
                             <TableRow>
@@ -171,7 +188,7 @@ function ViewRoom() {
                             ))}
                             </TableBody>
                         </Table>
-                    </TableContainer>
+                    </TableContainer> */}
                 </Grid>
                 <Grid item xs={12} mt={4}>
                     <Button variant='contained' color='info' onClick={() => window.history.go(-1)}>Back</Button>

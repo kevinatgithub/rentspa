@@ -3,7 +3,7 @@ import { Box } from '@mui/system'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ThreeDotMenu from '../../lib/ThreeDotMenu';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ProfileModel, RoomModel, stringAvatar } from '../models';
 import API from '../../api';
 import BoyIcon from '@mui/icons-material/Boy';
@@ -63,8 +63,9 @@ const Room: FC<RoomProps> = ({room, handleDeleteDone}) => {
                 title={room.name}
                 subheader={`Monthly Rate: P ${room.pricePerMonth}`}
             />
-            <CardContent>
+            <CardContent style={{minHeight:300}}>
                 <Grid container spacing={2} rowSpacing={2} p={2}>
+                    {tenants.length == 0 && <Grid item xs={12}><Typography variant='overline'>No Tenants</Typography></Grid>}
                     {tenants.map(t => <>
                         <Grid item xs={12} md={6}>
                             <Grid container spacing={2} alignItems={'center'}>
@@ -72,7 +73,7 @@ const Room: FC<RoomProps> = ({room, handleDeleteDone}) => {
                                     <Avatar {...stringAvatar(t.name)} />
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant='overline'>
+                                    <Typography style={{cursor:'pointer'}} onClick={() => navigate(`/profiles/${t.id}`)} variant='overline'>
                                         {t.name}
                                     </Typography>
                                 </Grid>
