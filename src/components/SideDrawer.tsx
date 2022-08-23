@@ -17,6 +17,8 @@ import HotelIcon from '@mui/icons-material/Hotel';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import SearchAppBar from './SearchAppBar';
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import { COOKIE_NAME } from './models';
 
 interface SideDrawerProps {
     children?: JSX.Element
@@ -25,6 +27,7 @@ interface SideDrawerProps {
 const SideDrawer:React.FC<SideDrawerProps> = ({children}) => {
     const navigate = useNavigate()
   const [open, setOpen] = React.useState(false);
+  const [cookies,setCookie,removeCookie] = useCookies([COOKIE_NAME])
 
   const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
       if (
@@ -38,6 +41,10 @@ const SideDrawer:React.FC<SideDrawerProps> = ({children}) => {
       setOpen(open);
     };
 
+    const handleLogout = () => {
+        removeCookie(COOKIE_NAME)
+    }
+
   return (
     <div>
         <Drawer
@@ -45,66 +52,68 @@ const SideDrawer:React.FC<SideDrawerProps> = ({children}) => {
             open={open}
             onClose={toggleDrawer(false)}
           >
+            {cookies.appuser && <>
             <Box
                 sx={{ width:250 }}
                 role="presentation"
                 onClick={toggleDrawer(false)}
                 onKeyDown={toggleDrawer(false)}
                 >
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={e => navigate("/profiles/create")}>
-                            <ListItemIcon>
-                                <PersonAddAlt1Icon />
-                            </ListItemIcon>
-                            <ListItemText primary={"New Boarder"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={e => navigate("/payments/create")}>
-                            <ListItemIcon>
-                                <PaymentIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"Receive Payment"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={e => navigate("/payments")}>
-                            <ListItemIcon>
-                                <ListIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"Payment Records"} />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-                <Divider />
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={e => navigate("/profiles")}>
-                            <ListItemIcon>
-                                <PeopleAltIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"Boarders"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={e => navigate("/rooms")}>
-                            <ListItemIcon>
-                                <HotelIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"Rooms and Beds"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={e => navigate("/rooms")}>
-                            <ListItemIcon>
-                                <PowerSettingsNewIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"Logout"} />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                    <List>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={e => navigate("/profiles/create")}>
+                                <ListItemIcon>
+                                    <PersonAddAlt1Icon />
+                                </ListItemIcon>
+                                <ListItemText primary={"New Boarder"} />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={e => navigate("/payments/create")}>
+                                <ListItemIcon>
+                                    <PaymentIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Receive Payment"} />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={e => navigate("/payments")}>
+                                <ListItemIcon>
+                                    <ListIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Payment Records"} />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                    <Divider />
+                    <List>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={e => navigate("/profiles")}>
+                                <ListItemIcon>
+                                    <PeopleAltIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Boarders"} />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={e => navigate("/rooms")}>
+                                <ListItemIcon>
+                                    <HotelIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Rooms and Beds"} />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={e => handleLogout()}>
+                                <ListItemIcon>
+                                    <PowerSettingsNewIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Logout"} />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
             </Box>
+            </>}
 
           </Drawer>
         <SearchAppBar setDrawerOpen={setOpen} />

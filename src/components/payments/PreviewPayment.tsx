@@ -1,6 +1,7 @@
 import { Alert, Button, Card, CardContent, Divider, Grid, Snackbar, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useReactToPrint } from 'react-to-print'
 import API from '../../api'
 import { formatDateStr, PaymentModel, ProfileModel, RentModel, RoomModel } from '../models'
 
@@ -11,6 +12,10 @@ function PreviewPayment() {
     const [rent, setRent] = useState<RentModel|null>(null)
     const [room, setRoom] = useState<RoomModel|null>(null)
     const [profile, setProfile] = useState<ProfileModel|null>(null)
+    const receiptRef = useRef<any>()
+    const printReceipt = useReactToPrint({
+        content: () => receiptRef.current
+    })
     useEffect(() => {
         async function getProfile(id:string){
             return (await API.get(`/Profiles/${id}`)).data
@@ -47,7 +52,7 @@ function PreviewPayment() {
         { payment && profile && rent && room && <>
             <Card>
                 <CardContent>
-                    <Grid container p={2} spacing={2} rowSpacing={2}>
+                    <Grid container p={2} spacing={2} rowSpacing={2} ref={receiptRef}>
                         <Grid item xs={12}>
                             <Typography variant={'h4'} gutterBottom component="div">
                                 Payment Details
@@ -146,8 +151,10 @@ function PreviewPayment() {
                                 Wevina Cainday
                             </Typography>
                         </Grid>
+                    </Grid>
+                    <Grid container p={2} spacing={2} rowSpacing={2}>
                         <Grid item xs={12} md={4} lg={2} xl={2}>
-                            <Button variant='contained' color='primary' size='medium' fullWidth>Print</Button>
+                            <Button variant='contained' color='primary' size='medium' fullWidth onClick={e => printReceipt()}>Print</Button>
                         </Grid>
                         <Grid item xs={6} md={3} xl={2}>
                             <Button variant='contained' color='warning' size='medium' fullWidth onClick={e => setOpen(true)}>Revoke</Button>

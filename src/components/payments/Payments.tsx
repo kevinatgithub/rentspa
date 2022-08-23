@@ -44,10 +44,10 @@ function Payments() {
                     Payments
                 </Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
                 <TextField fullWidth label="Search Payment" size="small" value={search} onChange={e => setSearch(e.target.value)} />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
                 <Button variant='contained' onClick={() => doSearch()}>Search</Button>
                 <Button style={{marginLeft:10}} variant='contained' color='secondary' onClick={() => clear()}>Clear</Button>
             </Grid>

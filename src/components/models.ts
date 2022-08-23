@@ -1,6 +1,9 @@
 import moment from "moment"
 import API from "../api"
 
+export const COOKIE_NAME = `appuser`
+export const COOKIE_EXPIRATION = 15
+
 export interface RoomModel{
     id: number,
     name: string,
