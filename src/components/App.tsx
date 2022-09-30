@@ -24,6 +24,7 @@ import CookieTest from './CookieTest';
 import { useCookies } from 'react-cookie';
 import { COOKIE_NAME } from './models';
 import Login from './Login';
+import { useState } from 'react';
 
 
 function App() {
@@ -49,6 +50,10 @@ function App() {
     });
 
     const [cookies] = useCookies([COOKIE_NAME])
+
+    const [showAvailableRooms, setShowAvailableRooms] = useState<boolean>(false);
+    const [showToPrintOnly, setShowToPrintOnly] = useState<boolean>(false);
+    
   return (
     <>
         <ThemeProvider theme={theme}>
@@ -64,7 +69,7 @@ function App() {
                           </>}
                           {cookies?.appuser && <>
                             <Routes>
-                                <Route path="/payments" element={<Payments />}></Route>
+                                <Route path="/payments" element={<Payments showToPrintOnly={showToPrintOnly} setShowToPrintOnly={setShowToPrintOnly} />}></Route>
                                 <Route path="/payments/:id" element={<PreviewPayment />}></Route>
                                 <Route path="/payments/create" element={<NewPayment />}></Route>
                                 <Route path="/rents" element={<Rents />}></Route>
@@ -73,13 +78,14 @@ function App() {
                                 <Route path="/profiles/create" element={<CreateProfile />}></Route>
                                 <Route path="/profiles/:id" element={<ViewProfile />}></Route>
                                 <Route path="/profiles/:id/update" element={<UpdateProfile />}></Route>
-                                <Route path="/rooms" element={<Rooms />}></Route>
+                                <Route path="/rooms" element={<Rooms showAvail={showAvailableRooms} setShowAvail={setShowAvailableRooms} />}></Route>
                                 <Route path="/rooms/create" element={<CreateRoom />}></Route>
                                 <Route path="/rooms/:id" element={<ViewRoom />}></Route>
                                 <Route path="/rooms/:id/update" element={<CreateRoom />}></Route>
                                 <Route path="/notfound" element={<NotFound />}></Route>
                                 <Route path="/cookie" element={<CookieTest />}></Route>
                                 <Route path="/" element={<NewPayment />}></Route>
+                                <Route path="*" element={<NewPayment />}></Route>
                             </Routes>
                           </>}
                     </Container>

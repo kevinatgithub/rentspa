@@ -1,11 +1,11 @@
-import { Alert, Autocomplete, Button, Card, CardContent, CircularProgress, Divider, Grid, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Alert, Autocomplete, Button, Card, CardContent, CircularProgress, Divider, Grid, InputAdornment, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { Field, Form, Formik } from 'formik'
 import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
 import API from '../../api'
-import { dateToApi, getStrDateToday, ProfileModel, RentDetailModel, RentModel, RoomModel } from '../models'
+import { dateToApi, getStrDateToday, ProfileModel, RentDetailModel, RentModel, RentStatus, RoomModel } from '../models'
 import SelectField from '../../lib/SelectField'
 import MyField from '../../formik/examples/shared/MyField'
 
@@ -21,12 +21,12 @@ function NewPayment() {
     const [saving, setSaving] = useState<boolean>(false)
     const navigate = useNavigate()
 
-    const [initialValues] = useState({
-        profile: null, rentId: null, paidAmount: "", particulars: '',
+    const [initialValues, setInitialValues] = useState({
+        profile: null, rentId: null, paidAmount: 0, particulars: '',
         periodCovered: {
             startDate: "", endDate: ""
         },
-        paidDateTime: getStrDateToday(), paidBy: "", paymentType: "room"
+        paidDateTime: getStrDateToday(), paidBy: "", paymentType: "room", balance: 0
     })
 
     useEffect(() => {
@@ -148,11 +148,15 @@ function NewPayment() {
                                         options={rentDetails.map(r => {
                                             return {
                                                 //label: `${r.room.name} - ${formatMMDDYYYY(new Date(r.rent.startDateTime))}`, value: r.rent.id
-                                                label: `${r.room.name}`, value: r.rent.id
+                                                label: `${r.room.name} - ${RentStatus[r.rent.status]}`, value: r.rent.id
                                             }
                                         })}
                                         fullWidth
-                                        value={formik.values?.rentId}
+                                        value={formik.values?.rentId} 
+                                        customOnChange={(rentId:number) => { 
+                                            formik.setFieldValue('rentId', rentId)
+                                            calculateBalance(rentDetails, rentId, formik.values.paidAmount, formik.setFieldValue)
+                                        }}
                                     />}
                                 </Grid>
                                 {formik?.values?.rentId && <>
@@ -161,7 +165,7 @@ function NewPayment() {
                                             Payment Details
                                         </Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={12}>
+                                    {/* <Grid item xs={12} md={12}>
                                         <Typography variant="overline">Payment For</Typography>
                                         <Field name="paymentType">
                                             {(fieldProps: any) => <ToggleButtonGroup
@@ -176,24 +180,26 @@ function NewPayment() {
                                                 <ToggleButton value="others">Others</ToggleButton>
                                             </ToggleButtonGroup>}
                                         </Field>
-                                    </Grid>
-                                    <Grid item xs={12} md={12}>
+                                    </Grid> */}
+                                    <Grid item xs={12} md={6}>
                                         <Field name="paidAmount" >
-                                            {(fieldProps: any) =>
-                                                <MyField fullWidth fieldProps={fieldProps} label="Amount Paid (Required)" />
-                                            }
+                                            {(fieldProps:any) => <MyField fullWidth label="Amount Paid (Required)" fieldProps={fieldProps} 
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start">P</InputAdornment>
+                                            }} 
+                                            onChange={(e:any) => {
+                                                formik.setFieldValue('paidAmount', e.target.value)
+                                                if (formik.values?.rentId){
+                                                    calculateBalance(rentDetails, formik.values?.rentId, e.target.value, formik.setFieldValue)
+                                                }
+                                            }} />}
                                         </Field>
                                     </Grid>
-                                    <Grid item xs={12} md={12}>
+                                    <Grid item xs={12} md={6}>
                                         <Field name="balance">
-                                            {(fieldProps: any) => <MyField fullWidth fieldProps={fieldProps} label="Balance" />}
-                                        </Field>
-                                    </Grid>
-                                    <Grid item xs={12} md={12}>
-                                        <Field name="particulars" >
-                                            {(fieldProps: any) =>
-                                                <MyField fieldProps={fieldProps} fullWidth {...fieldProps.field} label="Particulars" rows={4} multiline />
-                                            }
+                                            {(fieldProps:any) => <MyField fullWidth label="Remaining Balance" fieldProps={fieldProps} InputProps={{
+                                                startAdornment: <InputAdornment position="start">P</InputAdornment>
+                                            }} />}
                                         </Field>
                                     </Grid>
                                     <Grid item xs={12} md={6}>
@@ -204,6 +210,13 @@ function NewPayment() {
                                     <Grid item xs={12} md={6}>
                                         <Field name="paidDateTime" >
                                             {(fieldProps: any) => <MyField InputLabelProps={{ shrink: true, required: false }} type="date" fullWidth label="Date of Payment" fieldProps={fieldProps} />}
+                                        </Field>
+                                    </Grid>
+                                    <Grid item xs={12} md={12}>
+                                        <Field name="particulars" >
+                                            {(fieldProps: any) =>
+                                                <MyField fieldProps={fieldProps} fullWidth {...fieldProps.field} label="Particulars" rows={4} multiline />
+                                            }
                                         </Field>
                                     </Grid>
                                     <Grid item xs={12} alignItems={'center'}>
@@ -266,4 +279,12 @@ function toMonthName(monthNumber: number) {
     return date.toLocaleString('en-US', {
         month: 'long',
     });
+}
+
+function calculateBalance(rentDetails: RentDetailModel[], rentId: number, paidAmount: number, setFieldValue:Function){
+    const rents = rentDetails.filter(r => r.rent.id === rentId)
+    if (rents.length > 0){
+        const balance = rents[0].room.pricePerMonth - paidAmount
+        setFieldValue('balance', balance >= 0 ? balance : 0)
+    }
 }

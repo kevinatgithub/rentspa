@@ -8,6 +8,10 @@ import RoomInfoCard from '../rooms/RoomInfoCard'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { AnyObject } from 'yup/lib/object'
 
+interface RoomPlus extends RoomModel {
+    rent: RentModel
+}
+
 const ViewProfile:FC = () => {
     const navigate = useNavigate()
     const [open, setOpen] = useState(false);
@@ -15,7 +19,8 @@ const ViewProfile:FC = () => {
     const handleToggle = () => setOpen((prevOpen) => !prevOpen);
     const { id } = useParams()
     const [profile, setProfile] = useState<ProfileModel | null>(null)
-    const [rooms, setRooms] = useState<RoomModel[]>([])
+    const [rooms, setRooms] = useState<RoomPlus[]>([])
+    const [activeRoomId, setActiveRoomId] = useState<RoomModel| null>(null)
     const [rent, setRent] = useState<RentModel>({ remarks: ''} as RentModel)
 
     useEffect(() => {
@@ -29,14 +34,19 @@ const ViewProfile:FC = () => {
             let rents = rentsRequest.data.sort((a:RentModel, b:RentModel) => {
                 return b.id - a.id
             });//?.filter((rnt:any) => rnt.status === RentStatus.Active)
-            let rooms : any[] = []
+            let rooms : RoomPlus[] = []
             for(const rent of rents){
                 let roomRequest = await API.get(`/Rooms/${rent.roomId}`);
-                let nroom = {...roomRequest.data, status: rent.status}
+                let nroom = {...roomRequest.data, status: rent.status, rent}
                 rooms.push(nroom)
             }
 
             setRooms(rooms)
+            if (rents.length > 0){
+                const activeRents = rents.filter((r:RentModel) => r.status === 0)
+                if (activeRents?.length > 0)
+                    setActiveRoomId(activeRents[0].roomId)
+            }
         }
         API.get(`/Profiles/${id}`).then(r => {
             if (!r.data){
@@ -81,7 +91,8 @@ const ViewProfile:FC = () => {
                         <Grid item xs={12}>
                             <Typography variant="overline">
                                 <b>Profile Details</b>
-                                <Button variant='text' style={{float:'right'}} onClick={() => navigate(`/Profiles/${id}/update`)}>Update Profile</Button>
+                                <Button variant='text' style={{float:'right'}} onClick={() => navigate(`/profiles/transfer/${id}/${activeRoomId ?? 0}`)}>Transfer Room</Button>
+                                <Button variant='text' style={{float:'right'}} onClick={() => navigate(`/profiles/${id}/update`)}>Update Profile</Button>
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
@@ -106,11 +117,31 @@ const ViewProfile:FC = () => {
                             <Typography variant="overline">{profile.gender != '' ? profile.gender : 'NOT PROVIDED'}</Typography>
                         </Grid>
                         <Grid item xs={6} sm={6} md={4} lg={2}>
+                            <Typography variant="overline">Profile Remarks</Typography>
+                        </Grid>
+                        <Grid item xs={6} sm={6} md={8} lg={10}>
+                            <Typography variant="overline">{profile.remarks}</Typography>
+                        </Grid>
+                        <Grid item xs={6} sm={6} md={4} lg={2}>
                             <Typography variant="overline">Tenant Remarks</Typography>
                         </Grid>
                         <Grid item xs={6} sm={6} md={8} lg={10}>
                             <Typography variant="overline">{rent.remarks}</Typography>
                         </Grid>
+                        <Grid item xs={12}>
+                            <Divider />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button variant='contained' onClick={() => window.history.go(-1)}>Back</Button>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
+        </Grid>
+        <Grid item xs={12} md={12} lg={6}>
+            <Card>
+                <CardContent>
+                    <Grid container p={2} spacing={2} rowSpacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="overline"><b>Room Details</b></Typography>
                         </Grid>
@@ -118,11 +149,8 @@ const ViewProfile:FC = () => {
                             <Divider />
                         </Grid>
                         {rooms.map((r:any,i:number) => <>
-                            {r && <RoomInfoCard key={i} room={r} />}
+                            {r && <RoomInfoCard key={i} room={r} profileId={id} />}
                         </>)}
-                        <Grid item xs={12}>
-                            <Button variant='contained' onClick={() => window.history.go(-1)}>Back</Button>
-                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>

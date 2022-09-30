@@ -43,13 +43,18 @@ function Login() {
         <CardContent>
             <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
                 {formik => <Form>
-                    <Grid container spacing={2} rowSpacing={2}>
+                    <Grid container spacing={2} rowSpacing={2} minHeight={600}>
                         {error && <Grid item xs={12}>
                             <Alert variant='outlined' color='error'>{error}</Alert>
                         </Grid>}
 
+                        <Grid item xs={12} md={3} lg={4}>
+                        </Grid>
                         <Grid item xs={12} md={6} lg={4}>
                             <Grid container spacing={2} rowSpacing={2}>
+                                <Grid item xs={12} style={{textAlign:'center'}}>
+                                    <img src="http://wenaboarding.somee.com/wenaboarding.png" />
+                                </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant='overline'>User Login</Typography>
                                 </Grid>
@@ -67,6 +72,8 @@ function Login() {
                                     <Button fullWidth variant='contained' onClick={() => formik.submitForm()}>Login</Button>
                                 </Grid>
                             </Grid>
+                        </Grid>
+                        <Grid item xs={12} md={3} lg={4}>
                         </Grid>
                     </Grid>
                 </Form>}

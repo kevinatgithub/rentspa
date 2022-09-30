@@ -16,7 +16,8 @@ export interface ProfileModel{
     id: number,
     name: string,
     gender: string,
-    contactNumber: string
+    contactNumber: string,
+    remarks: string
 }
 
 export interface RentModel{
@@ -32,7 +33,7 @@ export interface RentModel{
 export interface CreateRentModel{
     profileId: number,
     roomId: number,
-    startDateTime: string,
+    startDate: string,
     remarks: string,
 }
 
@@ -55,7 +56,9 @@ export interface PaymentModel{
   status: number,
   particulars: string| null,
   paidBy: string,
-  paymentForRoom: boolean
+  paymentForRoom: boolean,
+  lastPrintDate: string,
+  printedTime: number
 }
 
 export enum RentStatus
@@ -144,7 +147,7 @@ export function stringToColor(string: string) {
   }
 
   export function formatDateStr(dtStr: string, format?:string){
-    if (!dtStr) return ''
+    if (!dtStr || dtStr === '0001-01-01T00:00:00') return ''
     return moment(dtStr).format(format ?? `ll`)
   }
 

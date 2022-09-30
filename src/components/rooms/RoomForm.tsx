@@ -35,6 +35,11 @@ const  RoomForm:FC<RoomFormProps> = ({editing, nameField, remarksField}) => {
                     {(fieldProps:any) => <MyField fullWidth label="Room Remarks" fieldProps={fieldProps} multiline rows={2} />}
                 </Field>
             </Grid>
+            <Grid item xs={12} md={6} lg={6}>
+                <Field name={"capacity"} >
+                    {(fieldProps:any) => <MyField type="number" fullWidth label="Capacity" fieldProps={fieldProps} />}
+                </Field>
+            </Grid>
         </Grid>
     </>
   )

@@ -12,16 +12,17 @@ interface MyFieldProps {
     maxRows?: number,
     value?: any,
     defaultValue?: any,
-    InputLabelProps?: any
+    InputLabelProps?: any,
+    onChange?: Function
 }
 
 const MyField:FC<MyFieldProps> = ({fieldProps, ...otherProps}) => {
     const {field, meta} = fieldProps
     return <TextField 
+        {...field} 
         {...otherProps}
         {...(meta.error && meta.touched ? {error:true} : {})}
         {...(meta.error && meta.touched ? {helperText: meta.error} : {})}
-        {...field} 
     />
 }
 

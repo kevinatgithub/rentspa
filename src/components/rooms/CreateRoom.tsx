@@ -10,7 +10,7 @@ const CreateRoom:FC = () => {
     const { id } = useParams()
     const editing = id ? true : false
     const [initialValues, setInitialValues] = useState({
-        name: "", monthlyRate: "", remarks: ""
+        name: "", monthlyRate: "", remarks: "", capacity: 1
     })
     const navigate = useNavigate()
     const [open, setOpen] = useState(false);
@@ -20,9 +20,11 @@ const CreateRoom:FC = () => {
         if ( id ){
             API.get(`/Rooms/${id}`).then(r => {
                 if (r.data){
-                    const {name, pricePerMonth, remarks} = r.data
-                    setInitialValues({
-                        name, remarks, monthlyRate: pricePerMonth
+                    const {name, pricePerMonth, remarks, capacity} = r.data
+                    setInitialValues((old:any) => {
+                        return {
+                        ...old, name, remarks, monthlyRate: pricePerMonth, capacity
+                        }
                     })
                 }
             })
@@ -41,15 +43,16 @@ const CreateRoom:FC = () => {
                 id:0,
                 name: values.name,
                 pricePerMonth: values.monthlyRate*1,
-                remarks: values.remarks
+                remarks: values.remarks,
+                capacity: values.capacity
             }).then(result => {
                 navigate("/rooms")
             })
         } else {
             API.put(`/Rooms`, {
-                id, name: values.name, pricePerMonth: values.monthlyRate*1, remarks: values.remarks
+                id, name: values.name, pricePerMonth: values.monthlyRate*1, remarks: values.remarks, capacity: values.capacity
             }).then(_ => {
-                navigate(`/rooms/${id}`)
+                window.history.go(-1)
             })
         }
         setOpen(true);

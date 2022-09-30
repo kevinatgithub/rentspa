@@ -33,6 +33,11 @@ function Profiles() {
         API.get(`/Profiles/find/${search}`).then(result => setProfiles(result.data))
     }
 
+    const handleClear = () => {
+        setSearch('')
+        refreshList()
+    }
+
   return (
     <>
         <Card>
@@ -41,11 +46,10 @@ function Profiles() {
                     <Grid item xs={12} md={6} lg={6}>
                         <TextField size='small' fullWidth id="searchRoom" name="searchRoom" placeholder='Search Profile' value={search} onChange={e => setSearch(e.target.value)} />
                     </Grid>
-                    <Grid item xs={12} md={3} lg={2}>
-                        <Button variant='contained' size='medium' fullWidth color='secondary' onClick={handleSearch}>Search</Button>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={2}>
-                        <Link to={"/profiles/create"}><Button variant='contained' size='medium' fullWidth>Add New Profile</Button></Link>
+                    <Grid item xs={12} md={6} lg={6}>
+                        <Button style={{minWidth:100}} variant='contained' size='medium' color='secondary' onClick={handleSearch}>Search</Button>
+                        <Button style={{marginLeft:15, minWidth:100}} variant='contained' size='medium' color='info' onClick={handleClear}>Clear</Button>
+                        <Link to={"/profiles/create"}><Button style={{marginLeft:15, minWidth:100}} variant='contained' size='medium'>Add New Profile</Button></Link>
                     </Grid>
                     <Grid item xs={12} >
                         <Grid container spacing={2} >

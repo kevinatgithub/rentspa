@@ -50,6 +50,7 @@ function ViewRoom() {
         setSbOpen(true)
         refreshState()
     }
+    const availableCapacity = room ? room.capacity - (tenants.length) : 0
   return (
     <>
         {room && 
@@ -108,20 +109,30 @@ function ViewRoom() {
                                     </Grid>
                                     <Grid item xs={6} md={4} xl={2}>
                                         <Typography variant="overline" gutterBottom component="div">
-                                            Capacity
+                                            Max Capacity
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={6} md={8} xl={10} alignItems={'center'} justifyContent="center">
                                         <Typography variant="overline" gutterBottom component="div">
-                                            {room.capacity} <GroupIcon />
+                                            {room.capacity} 
                                         </Typography>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6} md={4} xl={2}>
+                                        <Typography variant="overline" gutterBottom component="div">
+                                            Available
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={6} md={8} xl={10} alignItems={'center'} justifyContent="center">
+                                        <Typography variant="overline" gutterBottom component="div">
+                                            {availableCapacity} 
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={6} md={4} xl={2}>
                                         <Typography variant="overline" gutterBottom component="div">
                                             Remarks
                                         </Typography>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6} md={8} xl={10}>
                                         <Typography variant="overline" gutterBottom component="div">
                                             {room.remarks ? room.remarks :'-'}
                                         </Typography>
@@ -147,48 +158,6 @@ function ViewRoom() {
                         Payment History
                     </Typography>
                     <PaymentTable payments={payments} />
-                    {/* <TableContainer component={Paper}>
-                        <Table aria-label="simple table" sx={{ minWidth: 500}}>
-                            <TableHead>
-                            <TableRow>
-                                <TableCell>Date</TableCell>
-                                <TableCell>Paid By</TableCell>
-                                <TableCell>Period Covered</TableCell>
-                                <TableCell align="right">Amount</TableCell>
-                                <TableCell align="right"></TableCell>
-                            </TableRow>
-                            </TableHead>
-                            <TableBody>
-                            {payments.length === 0 && <TableRow>
-                                    <TableCell component="th" scope="row" rowSpan={5}>
-                                        No records yet
-                                    </TableCell>
-                                </TableRow>}
-                            {payments.map((row,i) => (
-                                <TableRow
-                                key={i}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                <TableCell component="th" scope="row">
-                                    {row.date}
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    {row.paidBy}
-                                </TableCell>
-                                <TableCell component="th" scope="row">
-                                    {row.startDate} - {row.endDate}
-                                </TableCell>
-                                <TableCell align="right">
-                                    {row.amount}
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Button variant='text' size='small'>Print</Button>
-                                </TableCell>
-                                </TableRow>
-                            ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer> */}
                 </Grid>
                 <Grid item xs={12} mt={4}>
                     <Button variant='contained' color='info' onClick={() => window.history.go(-1)}>Back</Button>

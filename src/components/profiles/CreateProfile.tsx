@@ -23,7 +23,17 @@ const CreateProfile:FC = () => {
     const ndate = new Date();
 
     const initialValues = {
-        name: "", room: "", gender: "", contactNumber: "", startDate: getStrDateToday(), remarks: "", monthlyRate: 0, roomName: "", roomRemarks: ""
+        name: "", 
+        room: "", 
+        gender: "", 
+        contactNumber: "", 
+        startDate: getStrDateToday(), 
+        remarks: "", 
+        monthlyRate: 0, 
+        roomName: "", 
+        roomRemarks: "", 
+        profileRemarks: "",
+        capacity: 1
     };
 
     const validationSchema = Yup.object({
@@ -50,19 +60,19 @@ const CreateProfile:FC = () => {
         let room = values.room
         if (values.room === 'new' ){
             var roomQuery = await API.post("/Rooms", {
-                id: 0, name: values.roomName, pricePerMonth: values.monthlyRate, remarks: values.roomRemarks
+                id: 0, name: values.roomName, pricePerMonth: values.monthlyRate, remarks: values.roomRemarks, capacity: values.capacity
             })
             room = roomQuery.data
         }
         API.post("/Profiles",{
-            id: 0, name: values.name, gender: values.gender, contactNumber: values.contactNumber
+            id: 0, name: values.name, gender: values.gender, contactNumber: values.contactNumber, remarks: values.profileRemarks
         } as ProfileModel).then(result => {
             const profile = result.data as ProfileModel
             API.post("/Rents",{
                 profileId: profile.id,
                 remarks: values.remarks,
                 roomId: room.id ? room.id : room,
-                startDateTime: values.startDate
+                startDate: values.startDate
             } as CreateRentModel).then(result => {
                 setOpen(true);
                 const timeout = window.setTimeout(() => {
@@ -138,9 +148,16 @@ const CreateProfile:FC = () => {
                                 {(fieldProps:any) => <MyField fullWidth label="Contact Number" fieldProps={fieldProps} />}
                             </Field>
                         </Grid>
-                        <Grid item xs={12} md={12} lg={12}>
-                            <Field name="remarks" >
+                        <Grid item xs={12} md={6} lg={6}>
+                        </Grid>
+                        <Grid item xs={12} md={6} lg={6}>
+                            <Field name="profileRemarks" >
                                 {(fieldProps:any) => <MyField multiline rows={2} fullWidth label="Profile Remarks" fieldProps={fieldProps} />}
+                            </Field>
+                        </Grid>
+                        <Grid item xs={12} md={6} lg={6}>
+                            <Field name="remarks" >
+                                {(fieldProps:any) => <MyField multiline rows={2} fullWidth label="Rent Remarks" fieldProps={fieldProps} />}
                             </Field>
                         </Grid>
                     </Grid>    

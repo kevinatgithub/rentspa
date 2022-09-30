@@ -1,0 +1,40 @@
+{
+    "version": "1.0.0",
+    "tasks": [
+        {
+            "label": "Run API",
+            "command": "dotnet",
+            "type": "process",
+            "isBackground": true,
+            "group": "build",
+            "args": [
+                "run",
+                "--project",
+                "C:\\Users\\cg255yl\\source\\repos\\wrfr\\WenasRoomForRent\\WenasRoomForRent\\WenasRoomForRent.Api.csproj",
+                "--urls=https://localhost:5152"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile",
+            "runOptions": {
+                "instanceLimit": 1
+            }
+        },
+        {
+            "label": "Run SPA",
+            "detail": "Run SPA",
+            "command": "npm start",
+            "type": "shell",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "terminate",
+            "type": "command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "terminateAll"
+        }
+    ]
+  }

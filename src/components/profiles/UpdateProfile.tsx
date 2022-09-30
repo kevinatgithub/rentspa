@@ -6,6 +6,7 @@ import API from '../../api'
 import SelectField from '../../lib/SelectField'
 import { ProfileModel } from '../models'
 import * as Yup from 'yup'
+import MyField from '../../formik/examples/shared/MyField'
 
 function UpdateProfile() {
     const {id} = useParams()
@@ -57,7 +58,10 @@ function UpdateProfile() {
                                 {(fieldProps:any) => <TextField fullWidth {...fieldProps.field} value={f.values?.contactNumber ?? ''} label="Contact Number" />}
                             </Field>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} md={12} lg={12}>
+                            <Field name={"remarks"} >
+                                {(fieldProps:any) => <MyField InputLabelProps={{ shrink: true, required: false }} fullWidth label="Profile Remarks" fieldProps={fieldProps} multiline rows={2} />}
+                            </Field>
                         </Grid>
                         <Grid item xs={12} md={4} lg={2}>
                             <Button fullWidth variant='contained' color='primary' onClick={() => f.submitForm()} disabled={!f.dirty || !f.isValid}>Save Changes</Button>

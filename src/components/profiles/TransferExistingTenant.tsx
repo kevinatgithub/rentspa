@@ -27,7 +27,7 @@ function TransferExistingTenant() {
     }, [id])
     
     const initialValues = {
-        personId: '', roomId: '', name: '', pricePerMonth: '', remarks: '', startDate: ''
+        personId: '', roomId: '', name: '', pricePerMonth: '', remarks: '', startDate: '', capacity: 1
     }
 
     const handleSubmit = async (values:any) => {
@@ -36,7 +36,7 @@ function TransferExistingTenant() {
         let roomId = values.roomId
         if (values.roomId === 'new' ){
             var roomQuery = await API.post("/Rooms", {
-                id: 0, name: values.name, pricePerMonth: values.monthlyRate, remarks: values.remarks
+                id: 0, name: values.name, pricePerMonth: values.monthlyRate, remarks: values.remarks, capacity: values.capacity
             })
             roomId = roomQuery.data.id
         }
@@ -47,7 +47,7 @@ function TransferExistingTenant() {
                 profileId: profile.id,
                 remarks: '',
                 roomId: roomId,
-                startDateTime: values.startDate
+                startDate: values.startDate
             } as CreateRentModel).then(result => {
                 setOpen(true);
                 const timeout = window.setTimeout(() => {

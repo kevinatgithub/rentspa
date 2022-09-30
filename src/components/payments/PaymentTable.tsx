@@ -38,6 +38,7 @@ const PaymentTable:FC<{payments:Payment[], isLoading?: boolean}> = ({payments, i
                           <StyledTableCell ><Typography variant='overline'>{p.payment.particulars}</Typography></StyledTableCell>
                           <StyledTableCell >
                             <Button variant='text' onClick={() => navigate(`/payments/${p.payment.id}`)}>View</Button>
+                            <Button variant='text' onClick={() => navigate(`/payments/${p.payment.id}`)}>Print</Button>
                           </StyledTableCell>
                         </StyledTableRow>
                     ))}

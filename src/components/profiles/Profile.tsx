@@ -1,10 +1,10 @@
 import { Avatar, Card, CardContent, CardHeader,IconButton } from '@mui/material'
 import { Box } from '@mui/system'
-import {  FC, useRef, useState } from 'react'
+import {  FC, useEffect, useRef, useState } from 'react'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ThreeDotMenu from '../../lib/ThreeDotMenu';
 import { useNavigate } from 'react-router-dom';
-import { ProfileModel, stringAvatar } from '../models';
+import { ProfileModel, RentModel, RoomModel, stringAvatar } from '../models';
 import API from '../../api';
 
 interface ProfileProps{
@@ -15,10 +15,25 @@ interface ProfileProps{
 const Profile: FC<ProfileProps> = ({profile, onDelete}) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
+    const [rent, setRent] = useState<RentModel|null>(null);
     const anchorRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (profile){
+            API.get(`/Rents/findByProfileId/${profile.id}`).then(result => {
+                if (result.data?.length){
+                    const activeRents = result.data?.filter((r:RentModel) => r.status === 0)
+                    if (activeRents?.length){
+                        setRent(activeRents[0])
+                    }
+                }
+            })
+        }
+    },[profile])
 
     const handleToggle = () => setOpen((prevOpen) => !prevOpen);
 
+    const handleTransfer = (obj:any) => navigate(`/profiles/transfer/${obj.id}/${rent?.roomId ?? 0}`)
     const handleViewDetails = (obj:any) => navigate(`/profiles/${obj.id}`)
     const handleUpdate = (obj:any) => navigate(`/profiles/${obj.id}/update`)
     const handleDelete = (obj:any) => {
@@ -37,6 +52,7 @@ const Profile: FC<ProfileProps> = ({profile, onDelete}) => {
             setOpen={setOpen} 
             anchorRef={anchorRef.current} 
             items={[
+                {label: 'Transfer', onClick: handleTransfer},
                 {label: 'View Details', onClick: handleViewDetails},
                 {label: 'Update', onClick: handleUpdate},
                 {label: 'Delete', onClick: handleDelete},

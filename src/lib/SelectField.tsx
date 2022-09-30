@@ -7,9 +7,10 @@ interface SelectFieldProps {
     label: string,
     options: any[],
     fullWidth?: boolean,
-    value?: any
+    value?: any,
+    customOnChange?: Function
 }
-const SelectField:FC<SelectFieldProps> = ({fieldName, fieldErrors, label, options, ...otherProps}) => {
+const SelectField:FC<SelectFieldProps> = ({fieldName, fieldErrors, label, options, customOnChange, ...otherProps}) => {
   return (
     <Field name={fieldName} >
         {(fieldProps:any) => {
@@ -20,7 +21,7 @@ const SelectField:FC<SelectFieldProps> = ({fieldName, fieldErrors, label, option
                         {...otherProps}
                         {...field}
                         label={label} 
-                        onChange={(e: any) => form.setFieldValue(field.name, e.target.value)}
+                        onChange={(e: any) => customOnChange ? customOnChange(e.target.value) : form.setFieldValue(field.name, e.target.value)}
                     >
                         {options.map((item:any, i:number) => 
                             <MenuItem key={i} value={item.value}>{item.label}</MenuItem>

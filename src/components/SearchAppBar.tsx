@@ -73,15 +73,16 @@ const SearchAppBar: React.FC<SearchAppBarProps> = ({setDrawerOpen}) => {
           >
             <MenuIcon />
           </IconButton>
+          <img src="http://wenaboarding.somee.com/wenaboarding.png" style={{maxWidth:40}} />
           <Typography
             variant="h6"
             noWrap
             component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, marginLeft:15 }}
           >
             Wena's Boarding House
           </Typography>
-          <Search>
+          {/* <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -89,7 +90,7 @@ const SearchAppBar: React.FC<SearchAppBarProps> = ({setDrawerOpen}) => {
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
             />
-          </Search>
+          </Search> */}
         </Toolbar>
       </AppBar>
     </Box>

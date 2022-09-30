@@ -1,30 +1,27 @@
-import { Avatar, Card, CardContent, CardHeader, ClickAwayListener, Divider, Grid, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material'
+import { Avatar, Card, CardContent, CardHeader, Divider, Grid, Hidden, IconButton, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ThreeDotMenu from '../../lib/ThreeDotMenu';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ProfileModel, RoomModel, stringAvatar } from '../models';
 import API from '../../api';
 import BoyIcon from '@mui/icons-material/Boy';
 import WomanIcon from '@mui/icons-material/Woman';
 import NoiseControlOffIcon from '@mui/icons-material/NoiseControlOff';
 
+export interface RoomWithTenants extends RoomModel{
+    tenants?: ProfileModel[],
+    available?: boolean
+}
 interface RoomProps{
-    room: RoomModel,
+    room: RoomWithTenants,
     handleDeleteDone: () => void
 }
 const Room: FC<RoomProps> = ({room, handleDeleteDone}) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
-    const [tenants, setTenants] = useState<ProfileModel[]>([])
     const anchorRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        if (room){
-            API.get(`/Profiles/findByRoomId/${room.id}`).then(r => setTenants(r.data))
-        }
-    }, [room])
 
     const handleToggle = () => setOpen((prevOpen) => !prevOpen);
 
@@ -38,6 +35,59 @@ const Room: FC<RoomProps> = ({room, handleDeleteDone}) => {
             })
         }
     }
+
+    const availableCapacity = room.capacity - (room.tenants?.length ?? 0)
+
+    const content = <Grid container spacing={2} rowSpacing={2} p={2}>
+                        <Grid item xs={6} md={4}>
+                            <Typography variant='overline'>
+                                Max Capacity
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={6} md={2}>
+                            <Typography variant='overline'>
+                                {room.capacity}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={6} md={4}>
+                            <Typography variant='overline'>
+                                Available
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={6} md={2}>
+                            <Typography variant='overline'>
+                                {availableCapacity > 0 ? availableCapacity : 0}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Divider />
+                        </Grid>
+                {(room.tenants?.length === 0 || !room.tenants) && <Grid item xs={12} style={{textAlign:'center'}}><Typography variant='overline'>No Tenants Yet</Typography></Grid>}
+                {room.tenants?.map(t => <>
+                    <Grid item xs={12} md={6}>
+                        <Grid container spacing={2} alignItems={'center'}>
+                            <Grid item xs={4}>
+                                <Avatar {...stringAvatar(t.name)} />
+                            </Grid>
+                            <Grid item xs={8}>
+                                <Typography style={{cursor:'pointer'}} onClick={() => navigate(`/profiles/${t.id}`)} variant='overline'>
+                                    {t.name}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </>)}
+                {room.remarks && <>
+                    <Grid item xs={12} alignContent='center'>
+                        <Divider />
+                    </Grid>
+                    <Grid item xs={12} alignContent='center'>
+                        <Typography variant='overline'>
+                            {room.remarks ? room.remarks : '-'}
+                        </Typography>
+                    </Grid>
+                </>}
+            </Grid>
 
   return (
     <Box mt={1} mb={1}>
@@ -63,33 +113,16 @@ const Room: FC<RoomProps> = ({room, handleDeleteDone}) => {
                 title={room.name}
                 subheader={`Monthly Rate: P ${room.pricePerMonth}`}
             />
-            <CardContent style={{minHeight:300}}>
-                <Grid container spacing={2} rowSpacing={2} p={2}>
-                    {tenants.length == 0 && <Grid item xs={12}><Typography variant='overline'>No Tenants</Typography></Grid>}
-                    {tenants.map(t => <>
-                        <Grid item xs={12} md={6}>
-                            <Grid container spacing={2} alignItems={'center'}>
-                                <Grid item xs={4}>
-                                    <Avatar {...stringAvatar(t.name)} />
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography style={{cursor:'pointer'}} onClick={() => navigate(`/profiles/${t.id}`)} variant='overline'>
-                                        {t.name}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </>)}
-                    <Grid item xs={12} alignContent='center'>
-                        <Divider />
-                    </Grid>
-                    <Grid item xs={12} alignContent='center'>
-                        <Typography variant='overline'>
-                            {room.remarks ? room.remarks : '-'}
-                        </Typography>
-                    </Grid>
-                </Grid>
-            </CardContent>
+            <Hidden smUp>
+                <CardContent>
+                    {content}
+                </CardContent>
+            </Hidden>
+            <Hidden smDown>
+                <CardContent style={{minHeight:300}}>
+                    {content}
+                </CardContent>
+            </Hidden>
         </Card>
     </Box>
   )
